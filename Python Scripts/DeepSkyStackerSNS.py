@@ -170,34 +170,38 @@ if os.path.isdir(Directory + "/Lights"):
                 FilelistResults.append(filename.split('.Info.txt')[0])
             else:
                 print("Rejecting: " + filename + " FWHM: " + str(FWHM_Pixels) + " > " + str(Goal_Post))
-StackingLights = []
-for image in LightImages:
-    for file in FilelistResults:
-        if image[0:len(FilelistResults[0])] == file:
-            StackingLights.append(image)
+if len(FilelistResults) != 0:
+    StackingLights = []
+    for image in LightImages:
+        for file in FilelistResults:
+            if image[0:len(FilelistResults[0])] == file:
+                StackingLights.append(image)
 
-# Generate Stacking Template
+    # Generate Stacking Template
 
-f = open(Directory + "/SNSStackingFilelist.txt", "w+")
-f.write(Template_top + "\n")
-for file in StackingLights:
-    f.write("""1	light	.\\Lights\\""" + file + "\n")
-for file in DarkImages:
-    f.write("""1	dark	.\\Darks\\""" + file + "\n")
-for file in FlatsImages:
-    f.write("""1	flat	.\\Flats\\""" + file + "\n")
-for file in DarkFlatsImages:
-    f.write("""1	darkflat	.\\DarkFlats\\""" + file + "\n")
-for file in BiasImages:
-    f.write("""1	offset	.\\Bias\\""" + file + "\n")
-f.write(Template_bottom)
-f.close()
+    f = open(Directory + "/SNSStackingFilelist.txt", "w+")
+    f.write(Template_top + "\n")
+    for file in StackingLights:
+        f.write("""1	light	.\\Lights\\""" + file + "\n")
+    for file in DarkImages:
+        f.write("""1	dark	.\\Darks\\""" + file + "\n")
+    for file in FlatsImages:
+        f.write("""1	flat	.\\Flats\\""" + file + "\n")
+    for file in DarkFlatsImages:
+        f.write("""1	darkflat	.\\DarkFlats\\""" + file + "\n")
+    for file in BiasImages:
+        f.write("""1	offset	.\\Bias\\""" + file + "\n")
+    f.write(Template_bottom)
+    f.close()
 
-# Call Deep Sky Stacker to Stack Images
-file_list_loc = str(os.path.join(Directory.replace('/', '\\') + os.sep, 'SNSStackingFilelist.txt'))
-tile_save_loc = str(os.path.join(Directory.replace('/', '\\') + os.sep, 'SNSDSSTile.tif'))
-subprocess.call('"C:\\Program Files\\DeepSkyStacker (64 bit)\\DeepSkyStackerCL.exe"' + ' /S "' + file_list_loc + '"')
-if os.path.isfile(str(os.path.join(Directory.replace('/', '\\') + os.sep, 'Lights\\Autosave.tif'))):
-    shutil.move(str(os.path.join(Directory.replace('/', '\\') + os.sep, 'Lights\\Autosave.tif')), tile_save_loc)
-if os.path.isfile(str(os.path.join(Directory.replace('/', '\\') + os.sep, 'Lights\\SNSStackingFilelist.tif'))):
-    shutil.move(str(os.path.join(Directory.replace('/', '\\') + os.sep, 'Lights\\SNSStackingFilelist.tif')), tile_save_loc)
+    # Call Deep Sky Stacker to Stack Images
+    file_list_loc = str(os.path.join(Directory.replace('/', '\\') + os.sep, 'SNSStackingFilelist.txt'))
+    tile_save_loc = str(os.path.join(Directory.replace('/', '\\') + os.sep, 'SNSDSSTile.tif'))
+    subprocess.call('"C:\\Program Files\\DeepSkyStacker (64 bit)\\DeepSkyStackerCL.exe"' + ' /S "' + file_list_loc + '"')
+    if os.path.isfile(str(os.path.join(Directory.replace('/', '\\') + os.sep, 'Lights\\Autosave.tif'))):
+        shutil.move(str(os.path.join(Directory.replace('/', '\\') + os.sep, 'Lights\\Autosave.tif')), tile_save_loc)
+    if os.path.isfile(str(os.path.join(Directory.replace('/', '\\') + os.sep, 'Lights\\SNSStackingFilelist.tif'))):
+        shutil.move(str(os.path.join(Directory.replace('/', '\\') + os.sep, 'Lights\\SNSStackingFilelist.tif')), tile_save_loc)
+else:
+    print("All Files Failed to Meet the Goal Post")
+    
