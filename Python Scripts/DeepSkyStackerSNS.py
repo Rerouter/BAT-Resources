@@ -154,7 +154,7 @@ subprocess.call('"C:\\Program Files\\DeepSkyStacker (64 bit)\\DeepSkyStackerCL.e
 
 FilelistResults = []
 # Get Image Scores
-
+print("Get Image Scores")
 if os.path.isdir(Directory + "/Lights"):
     for filename in os.listdir(Directory + "/Lights"):
         if filename.lower().endswith('.info.txt'):
@@ -166,7 +166,10 @@ if os.path.isdir(Directory + "/Lights"):
 
             FWHM_Pixels = round(sum(mean_radius_value) / len(mean_radius_value) * 1.5555 * PixelScale, 2)
             if FWHM_Pixels <= Goal_Post:
+                print("Including: " + filename + " FWHM: " + str(FWHM_Pixels))
                 FilelistResults.append(filename.split('.Info.txt')[0])
+            else:
+                print("Rejecting: " + filename + " FWHM: " + str(FWHM_Pixels) + " > " + str(Goal_Post))
 StackingLights = []
 for image in LightImages:
     for file in FilelistResults:
