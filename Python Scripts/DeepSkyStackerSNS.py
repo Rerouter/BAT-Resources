@@ -25,7 +25,8 @@ if os.path.isfile((Directory + "/info.txt")):
     f = open(Directory + "/info.txt", "r")
     for line in f:
         if "Arcsec / Pixel:" in line:
-            PixelScale = float(line.split(':', 1)[1])
+            if len(line.split(":", 1)) == 2:
+                PixelScale = float(line.split(':', 1)[1])
 
     PixelSize = 0
     FocalLength = 0
