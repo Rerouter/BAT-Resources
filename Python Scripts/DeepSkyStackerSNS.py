@@ -3,7 +3,6 @@
 import subprocess
 import os
 import shutil
-import tkinter as tk
 from tkinter import Tk, filedialog
 
 root = Tk()  # pointing root to Tk() to use it as Tk() in program.
@@ -171,7 +170,7 @@ if os.path.isdir(Directory + "/Lights"):
 StackingLights = []
 for image in LightImages:
     for file in FilelistResults:
-        if image.split('.')[0] == file:
+        if image[0:len(FilelistResults[0])] == file:
             StackingLights.append(image)
 
 # Generate Stacking Template
