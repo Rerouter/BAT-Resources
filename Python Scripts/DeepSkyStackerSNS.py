@@ -194,4 +194,7 @@ f.close()
 file_list_loc = str(os.path.join(Directory.replace('/', '\\') + os.sep, 'SNSStackingFilelist.txt'))
 tile_save_loc = str(os.path.join(Directory.replace('/', '\\') + os.sep, 'SNSDSSTile.tif'))
 subprocess.call('"C:\\Program Files\\DeepSkyStacker (64 bit)\\DeepSkyStackerCL.exe"' + ' /S "' + file_list_loc + '"')
-shutil.move(str(os.path.join(Directory.replace('/', '\\') + os.sep, 'Lights\\Autosave.tif')), tile_save_loc)
+if os.path.isfile(str(os.path.join(Directory.replace('/', '\\') + os.sep, 'Lights\\Autosave.tif'))):
+    shutil.move(str(os.path.join(Directory.replace('/', '\\') + os.sep, 'Lights\\Autosave.tif')), tile_save_loc)
+if os.path.isfile(str(os.path.join(Directory.replace('/', '\\') + os.sep, 'Lights\\SNSStackingFilelist.tif'))):
+    shutil.move(str(os.path.join(Directory.replace('/', '\\') + os.sep, 'Lights\\SNSStackingFilelist.tif')), tile_save_loc)
