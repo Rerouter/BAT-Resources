@@ -1,0 +1,42 @@
+Info:
+These 2 scripts are written for Python 3.8, and will be compiled after adding a UI to open it up to more people
+
+These scripts work on the assumption all of the images you want to stack are laid out in the format in the Imaging Guide,
+and that Deep Sky Stacker or Siril are installed in the default install location on a Windows PC,
+For the moment it is only stacking photos that score higher than 2.5 Arc Seconds FWHM, this is on line 18 and can be
+changed as needed, I will be breaking this out in the UI soon
+the SIRIL Script will need the library commented in the top of the script installed to use it.
+
+I do not expect people to take dark-flats, Its included in there for flexibility for those that do.
+
+Folder Name:
+  Bias
+  Darks
+  DarkFlats
+  Flats
+  Lights
+  info.txt
+  
+and that the info.txt file contains the following keywords with there values filled out
+Currently only Focal Length, Barlow Magnification, Pixel Size and Arcsec / Pixel are used
+if Arcsec / Pixel is not populated it will be calculated by the script using the other 3.
+ 
+Name / Alias: Euan
+Date: 09/04/2021
+Target: Messier 51
+Aperture: 102
+Focal Length: 500
+Telescope Type: Newtonion
+Corrector Fitted: No
+Barlow Magnification: 1
+Filters Used: No
+Camera: Canon Eos 4000D
+Pixel Size: 4.29
+Arcsec / Pixel: 1.77
+
+Instruction of use:
+When you open the script it will ask for a folder, please select the folder containing all of the Bias/Dark etc folders
+once selected,
+
+It will go through and register, score and stack the images into a tile that has your combined image in
+the top level folder, this process will take some time depending on how powerful your PC and the size of the data
