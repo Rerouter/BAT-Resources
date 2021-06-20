@@ -1,5 +1,6 @@
 #  Written by Ryan Favelle
 #  python -m pip install git+https://gitlab.com/free-astro/pysiril/uploads/3f945f98ac4d92cd1e1a6fa2717ccf56/pysiril-0.0.9-py3-none-any.whl
+#  Siril needs to be in the default installation location,
 
 import sys
 import os
@@ -21,7 +22,8 @@ if os.path.isfile((Directory + "/info.txt")):
     f = open(Directory + "/info.txt", "r")
     for line in f:
         if "Arcsec / Pixel:" in line:
-            PixelScale = float(line.split(':', 1)[1])
+            if len(line.split(":", 1)) == 2:
+                PixelScale = float(line.split(':', 1)[1])
 
     PixelSize = 0
     FocalLength = 0
@@ -66,22 +68,23 @@ def master_dark(dark_dir, process_dir):
     cmd.cd(process_dir)
     cmd.stack('dark', type='rej', sigma_low=3, sigma_high=3, norm='no')
 
+
 def light(light_dir, process_dir, hasflats=True, hasdarks=True, hasbias=True):
     cmd.cd(light_dir)
     cmd.convert('light', out=process_dir, fitseq=True )
     cmd.cd(process_dir)
     if hasflats and hasdarks and hasbias:
-        cmd.preprocess('light', dark='pp_dark_stacked', flat='pp_flat_stacked', bias='pp_bias_stacked', cfa=True, equalize_cfa=True, debayer=True )
+        cmd.preprocess('light', dark='dark', flat='flat', bias='bias', cfa=True, equalize_cfa=True, debayer=True )
     if hasflats and hasdarks and not hasbias:
-        cmd.preprocess('light', dark='pp_dark_stacked', flat='pp_flat_stacked', cfa=True, equalize_cfa=True, debayer=True )
+        cmd.preprocess('light', dark='dark', flat='flat', cfa=True, equalize_cfa=True, debayer=True )
     if hasflats and not hasdarks and hasbias:
-        cmd.preprocess('light', flat='pp_flat_stacked', bias='pp_bias_stacked', cfa=True, debayer=True)
+        cmd.preprocess('light', flat='flat', bias='bias', cfa=True, debayer=True)
     if hasflats and not hasdarks and not hasbias:
-        cmd.preprocess('light', flat='pp_flat_stacked', cfa=True, debayer=True)
+        cmd.preprocess('light', flat='flat', cfa=True, debayer=True)
     if hasdarks and not hasflats and hasbias:
-        cmd.preprocess('light', dark='pp_dark_stacked', bias='pp_bias_stacked', cfa=True, debayer=True)
+        cmd.preprocess('light', dark='dark', bias='bias', cfa=True, debayer=True)
     if hasdarks and not hasflats and not hasbias:
-        cmd.preprocess('light', dark='pp_dark_stacked', cfa=True, debayer=True)
+        cmd.preprocess('light', dark='dark', cfa=True, debayer=True)
     if not hasflats and not hasdarks and not hasbias:
         cmd.preprocess('light', cfa=True, debayer=True)
     cmd.register('pp_light')
