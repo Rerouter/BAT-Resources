@@ -21,6 +21,9 @@ DarkFlatsImages = []
 PixelScale = 0
 Goal_Post = 7.5
 SupportedFileFormats = ("crw", "cr2", "cr3", "nef", "raf", "dng", "kdc", "dcr", "fits")
+FilterName = "Lum"
+FolderFilter = "/" + FilterName
+FlippedFolderName = FilterName + "\\"
 
 if os.path.isfile((Directory + "/info.txt")):
     f = open(Directory + "/info.txt", "r")
@@ -44,24 +47,24 @@ if os.path.isfile((Directory + "/info.txt")):
             if PixelSize and FocalLength:
                 PixelScale = 206256 * PixelSize / FocalLength / BarlowMag
 
-if os.path.isdir(Directory + "/Lights "):
-    for filename in os.listdir(Directory + "/Lights"):
+if os.path.isdir(Directory + "/Light" + FolderFilter):
+    for filename in os.listdir(Directory + "/Light" + FolderFilter):
         if filename.lower().endswith(SupportedFileFormats):
             LightImages.append(filename)
-if os.path.isdir(Directory + "/Bias"):
-    for filename in os.listdir(Directory + "/Bias"):
+if os.path.isdir(Directory + "/Bias" + FolderFilter):
+    for filename in os.listdir(Directory + "/Bias" + FolderFilter):
         if filename.lower().endswith(SupportedFileFormats):
             BiasImages.append(filename)
-if os.path.isdir(Directory + "/Darks"):
-    for filename in os.listdir(Directory + "/Darks"):
+if os.path.isdir(Directory + "/Dark"):
+    for filename in os.listdir(Directory + "/Dark"):
         if filename.lower().endswith(SupportedFileFormats):
             DarkImages.append(filename)
-if os.path.isdir(Directory + "/Flats"):
-    for filename in os.listdir(Directory + "/Flats"):
+if os.path.isdir(Directory + "/Flat" + FolderFilter):
+    for filename in os.listdir(Directory + "/Flat" + FolderFilter):
         if filename.lower().endswith(SupportedFileFormats):
             FlatsImages.append(filename)
-if os.path.isdir(Directory + "/DarkFlats"):
-    for filename in os.listdir(Directory + "/DarkFlats"):
+if os.path.isdir(Directory + "/FlatDark" + FolderFilter):
+    for filename in os.listdir(Directory + "/FlatDark" + FolderFilter):
         if filename.lower().endswith(SupportedFileFormats):
             DarkFlatsImages.append(filename)
 
@@ -138,15 +141,15 @@ Template_bottom = """#WS#Software\\DeepSkyStacker\\FitsDDP|BayerPattern=4
 f = open(Directory + "/SNSRegisterFilelist.txt", "w+")
 f.write(Template_top + "\n")
 for file in LightImages:
-    f.write("""1	light	.\\Lights\\""" + file + "\n")
+    f.write("""1	light	.\\Light\\""" + FlippedFolderName + file + "\n")
 for file in DarkImages:
-    f.write("""1	dark	.\\Darks\\""" + file + "\n")
+    f.write("""1	dark	.\\Dark\\""" + file + "\n")
 for file in FlatsImages:
-    f.write("""1	flat	.\\Flats\\""" + file + "\n")
+    f.write("""1	flat	.\\Flat\\""" + FlippedFolderName + file + "\n")
 for file in DarkFlatsImages:
-    f.write("""1	darkflat	.\\DarkFlats\\""" + file + "\n")
+    f.write("""1	darkflat	.\\FlatDark\\""" + FlippedFolderName + file + "\n")
 for file in BiasImages:
-    f.write("""1	offset	.\\Bias\\""" + file + "\n")
+    f.write("""1	offset	.\\Bias\\""" + FlippedFolderName + file + "\n")
 f.write(Template_bottom)
 f.close()
 
@@ -157,16 +160,16 @@ subprocess.call('"C:\\Program Files\\DeepSkyStacker (64 bit)\\DeepSkyStackerCL.e
 FilelistResults = []
 # Get Image Scores
 print("Get Image Scores")
-if os.path.isdir(Directory + "/Lights"):
-    for filename in os.listdir(Directory + "/Lights"):
+if os.path.isdir(Directory + "/Light" + FolderFilter):
+    for filename in os.listdir(Directory + "/Light" + FolderFilter):
         if filename.lower().endswith('.info.txt'):
             mean_radius_value = []
-            f = open(Directory + "/Lights/" + filename, "r")
+            f = open(Directory + "/Light" + FolderFilter + "/" + filename, "r")
             for line in f:
                 if "MeanRadius" in line:
                     mean_radius_value.append(float(line.split('= ', 1)[1]))
             if len(mean_radius_value) > 2:
-                FWHM_Pixels = round(geometric_mean(mean_radius_value) * 1.5555 * PixelScale, 2)
+                FWHM_Pixels = geometric_mean(mean_radius_value) * 1.5555 * PixelScale
                 if FWHM_Pixels <= Goal_Post:
                     print("Including: " + filename.split('.Info.txt')[0] + " FWHM: " + str(FWHM_Pixels))
                     print(stdev(mean_radius_value))
@@ -186,27 +189,26 @@ if len(FilelistResults) != 0:
     f = open(Directory + "/SNSStackingFilelist.txt", "w+")
     f.write(Template_top + "\n")
     for file in StackingLights:
-        f.write("""1	light	.\\Lights\\""" + file + "\n")
+        f.write("""1	light	.\\Light\\""" + FlippedFolderName + file + "\n")
     for file in DarkImages:
-        f.write("""1	dark	.\\Darks\\""" + file + "\n")
+        f.write("""1	dark	.\\Dark\\""" + file + "\n")
     for file in FlatsImages:
-        f.write("""1	flat	.\\Flats\\""" + file + "\n")
+        f.write("""1	flat	.\\Flat\\""" + FlippedFolderName + file + "\n")
     for file in DarkFlatsImages:
-        f.write("""1	darkflat	.\\DarkFlats\\""" + file + "\n")
+        f.write("""1	darkflat	.\\FlatDark\\""" + FlippedFolderName + file + "\n")
     for file in BiasImages:
-        f.write("""1	offset	.\\Bias\\""" + file + "\n")
+        f.write("""1	offset	.\\Bias\\""" + FlippedFolderName + file + "\n")
     f.write(Template_bottom)
     f.close()
 
     # Call Deep Sky Stacker to Stack Images
     file_list_loc = str(os.path.join(Directory.replace('/', '\\') + os.sep, 'SNSStackingFilelist.txt'))
-    tile_save_loc = str(os.path.join(Directory.replace('/', '\\') + os.sep, 'SNSDSSTile.tif'))
+    tile_save_loc = str(os.path.join(Directory.replace('/', '\\') + os.sep, 'SNSDSSTile' + FilterName + '.tif'))
     subprocess.call(
         '"C:\\Program Files\\DeepSkyStacker (64 bit)\\DeepSkyStackerCL.exe"' + ' /S "' + file_list_loc + '"')
-    if os.path.isfile(str(os.path.join(Directory.replace('/', '\\') + os.sep, 'Lights\\Autosave.tif'))):
-        shutil.move(str(os.path.join(Directory.replace('/', '\\') + os.sep, 'Lights\\Autosave.tif')), tile_save_loc)
-    if os.path.isfile(str(os.path.join(Directory.replace('/', '\\') + os.sep, 'Lights\\SNSStackingFilelist.tif'))):
-        shutil.move(str(os.path.join(Directory.replace('/', '\\') + os.sep, 'Lights\\SNSStackingFilelist.tif')),
-                    tile_save_loc)
+    if os.path.isfile(str(os.path.join(Directory.replace('/', '\\') + os.sep, 'Light\\' + FlippedFolderName + 'Autosave.tif'))):
+        shutil.move(str(os.path.join(Directory.replace('/', '\\') + os.sep, 'Light\\' + FlippedFolderName + 'Autosave.tif')), tile_save_loc)
+    if os.path.isfile(str(os.path.join(Directory.replace('/', '\\') + os.sep, 'Light\\' + FlippedFolderName + 'SNSStackingFilelist.tif'))):
+        shutil.move(str(os.path.join(Directory.replace('/', '\\') + os.sep, 'Light\\' + FlippedFolderName + 'SNSStackingFilelist.tif')), tile_save_loc)
 else:
     print("All Files Failed to Meet the Goal Post")

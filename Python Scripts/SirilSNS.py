@@ -16,7 +16,7 @@ open_file = filedialog.askdirectory()  # Returns opened path as str
 
 Directory = open_file
 PixelScale = 0
-Goal_Post = 2.5
+Goal_Post = 7.5
 
 if os.path.isfile((Directory + "/info.txt")):
     f = open(Directory + "/info.txt", "r")
